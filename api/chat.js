@@ -1,4 +1,3 @@
-// api/chat.js
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Only POST allowed" });
@@ -13,16 +12,21 @@ export default async function handler(req, res) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          contents: [
+            {
+              parts: [{ text: prompt }]
+            }
+          ],
         }),
       }
     );
 
     const data = await response.json();
+
     const reply =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      data?.promptFeedback?.blockReason ||
-      "No response";
+      data?.error?.message ||
+      "⚠️ No response from Gemini";
 
     res.status(200).json({ reply });
   } catch (err) {
